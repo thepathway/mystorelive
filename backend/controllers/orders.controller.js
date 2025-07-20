@@ -4,40 +4,60 @@ import pool from '../models/db.js';
 // import { createOrder, getOrderByNumber } from '../models/order.model.js';
 
 
+// export const createOrder = async (req, res) => {
+//   const customerNumber = req.user.customerNumber;
+//   const cart = req.body.cart || [];
+
+//   try {
+//     const [customer] = await pool.query(
+//       "SELECT * FROM customers WHERE customerNumber = ?",
+//       [customerNumber]
+//     );
+
+//     if (!customer.length) return res.status(404).json({ error: "Customer not found" });
+
+//     const orderDate = new Date();
+//     const status = "In Process";
+//     const totalAmount = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+
+//     const [result] = await pool.query(
+//       "INSERT INTO orders (orderDate, status, customerNumber, totalAmount) VALUES (?, ?, ?, ?)",
+//       [orderDate, status, customerNumber, totalAmount]
+//     );
+
+//     const orderNumber = result.insertId;
+
+//     for (const item of cart) {
+//       await pool.query(
+//         "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach) VALUES (?, ?, ?, ?)",
+//         [orderNumber, item.productCode, item.quantity || 1, item.price]
+//       );
+//     }
+
+//     res.status(201).json({ message: "Order placed successfully" });
+//   } catch (err) {
+//     console.error("Order creation error:", err);
+//     res.status(500).json({ error: "Order creation failed" });
+//   }
+// };
+
+
 export const createOrder = async (req, res) => {
-  const customerNumber = req.user.customerNumber;
-  const cart = req.body.cart || [];
-
+  const { items, total, user } = req.body;
+  
   try {
-    const [customer] = await pool.query(
-      "SELECT * FROM customers WHERE customerNumber = ?",
-      [customerNumber]
-    );
-
-    if (!customer.length) return res.status(404).json({ error: "Customer not found" });
-
-    const orderDate = new Date();
-    const status = "In Process";
-    const totalAmount = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-
     const [result] = await pool.query(
-      "INSERT INTO orders (orderDate, status, customerNumber, totalAmount) VALUES (?, ?, ?, ?)",
-      [orderDate, status, customerNumber, totalAmount]
+      `INSERT INTO orders (userId, items, total, status) 
+       VALUES (?, ?, ?, 'pending')`,
+      [user.id, JSON.stringify(items), total]
     );
-
-    const orderNumber = result.insertId;
-
-    for (const item of cart) {
-      await pool.query(
-        "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach) VALUES (?, ?, ?, ?)",
-        [orderNumber, item.productCode, item.quantity || 1, item.price]
-      );
-    }
-
-    res.status(201).json({ message: "Order placed successfully" });
+    
+    res.json({ 
+      success: true, 
+      orderId: result.insertId 
+    });
   } catch (err) {
-    console.error("Order creation error:", err);
-    res.status(500).json({ error: "Order creation failed" });
+    res.status(500).json({ error: "Checkout failed by orders.controllers.js" });
   }
 };
 

@@ -242,8 +242,8 @@ export default function TemuClone() {
     }
   };
 
-  const handleCheckout = async () => {
-    
+  const handleCheckout = async (e) => {
+    console.log(e);
     const token = localStorage.getItem("token");
     const customerNumber = localStorage.getItem("customerNumber");
 
@@ -262,6 +262,27 @@ export default function TemuClone() {
     }
   };
 
+//   const handleCheckout = (e) => {
+//     console.log(e);
+//   const token = localStorage.getItem("token");
+//   const orderData = {
+//     items: cart,
+//     total: cart.reduce((sum, item) => sum + item.price, 0),
+//     user: { id: localStorage.getItem("userId") } // Add user ID storage after login
+//   };
+
+//   axios.post("http://localhost:3000/api/orders", orderData, {
+//     headers: { Authorization: `Bearer ${token}` }
+//   })
+//   .then(response => {
+//     alert(`Order #${response.data.orderId} placed successfully!`);
+//     setCart([]); // Clear cart
+//   })
+//   .catch(error => {
+//     console.error("Checkout error:", error);
+//     alert("Checkout failed. Please try again.");
+//   });
+// };
   return (
     <>
       <NavBar cartCount={cart.length} onCartClick={() => setShowCart(!showCart)} />

@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { saveCart, getCart } from '../controllers/cart.controller.js';
-import  verifyToken  from '../middleware/auth.js';
+import  {verifyToken}  from '../middleware/auth.js';
 
 const router = express.Router();
 
